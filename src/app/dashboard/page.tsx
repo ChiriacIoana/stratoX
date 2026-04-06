@@ -17,20 +17,19 @@ import Navbar from "@/src/components/common/Navbar";
 
 export default function Dashboard() {
   return (
-    <div className="flex">
+    <div className="flex h-screen">
       <Sidebar />
 
-      <div className="w-full bg-zinc-800 min-h-screen text-white">
+      <div className="flex flex-col flex-1 overflow-hidden">
         <Navbar />
 
-        <div className="p-8">
+        <div className="flex-1 overflow-auto bg-[#111317] p-6">
           <h1 className="text-3xl mb-6">Dashboard</h1>
 
           <div className="grid grid-cols-4 gap-4 mb-6">
-            <StatCard title="Temperature" value={24} unit="°C" />
-            <StatCard title="Humidity" value={60} unit="%" />
-            <StatCard title="Air Quality" value={110} unit="AQI" />
-            <StatCard title="Pressure" value={1012} unit="hPa" />
+           <StatCard title="Temperature" value={28} unit="°C" accentColor="bg-[#fb923c]" trend={{ label: "+2.1°", positive: true }} />
+            <StatCard title="Humidity" value={84} unit="%" accentColor="bg-[#2dd4bf]" trend={{ label: "+5%", positive: false }} />
+            <StatCard title="Air Quality" value={110} unit="AQI" accentColor="bg-[#7eb8f7]" trend={{ label: "+10", positive: true }} />
           </div>
 
           <div className="grid grid-cols-2 gap-6">
