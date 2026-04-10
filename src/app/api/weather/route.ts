@@ -29,7 +29,22 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
+  const {data, error}  =await supabase
+    .from("weather_data")
+    .select("*")
+    .order("timestamp", { ascending: true })
+    .limit(50);
+
+
+  if (error) {
+    return NextResponse.json({
+      success: false,
+      error
+    })
+  }
+
   return NextResponse.json({
-    message: "Working yey putem sa vedem vremea",
+    success: true,
+    data,
   });
 }

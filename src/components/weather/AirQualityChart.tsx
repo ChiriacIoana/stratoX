@@ -1,14 +1,16 @@
 "use client";
 
 import BaseChart from "../common/BaseChart";
-import { fakeWeatherData } from "../../lib/fakeData";
+import { useWeatherData } from "../../hooks/useWeatherData";
 
 export default function AirQualityChart() {
+  const data = useWeatherData();
+
   return (
     <BaseChart
       title="Air Quality"
-      data={fakeWeatherData}
-      dataKey="air"
+      data={data}
+      dataKey="air_quality"
       color="#7eb8f7"
       badgeLabel="24 hr"
     />

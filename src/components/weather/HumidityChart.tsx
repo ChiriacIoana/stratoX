@@ -1,13 +1,16 @@
 "use client";
 
 import BaseChart from "../common/BaseChart";
-import { fakeWeatherData } from "../../lib/fakeData";
+import { useWeatherData } from "../../hooks/useWeatherData";
 
 export default function HumidityChart() {
+  const data = useWeatherData();
+
+
   return (
     <BaseChart
       title="Humidity"
-      data={fakeWeatherData}
+      data={data}
       dataKey="humidity"
       color="#2dd4bf"
       badgeLabel="24 hr"
