@@ -9,67 +9,69 @@ import StatCard from "@/src/components/common/StatCard";
 export default function ForecastPage() {
   const [forecast, setForecast] = useState<any>(null);
 
-  async function warmupModel() {
-    const res = await fetch("/api/weather");
-    const json = await res.json();
+  // async function warmupModel() {
+  //   const res = await fetch("/api/weather");
+  //   const json = await res.json();
 
-    if (!json.success) return;
+  //   if (!json.success) return;
 
-    for (const row of json.data) {
-      let timestamp = Math.floor(Date.now() / 1000);
+  //   for (const row of json.data) {
+  //     let timestamp = Math.floor(Date.now() / 1000);
 
-      if (row.timestamp) {
-        const parsed = new Date(row.timestamp);
-        if (!isNaN(parsed.getTime())) {
-          timestamp = Math.floor(parsed.getTime() / 1000);
-        }
-      }
 
-      const payload = {
-        temperature: row.temperature,
-        humidity: row.humidity,
-        air_quality: Math.min(row.air_quality ?? 0, 1023),
-        timestamp,
-      };
+  //     if (row.timestamp) {
+  //       const parsed = new Date(row.timestamp);
+  //       if (!isNaN(parsed.getTime())) {
+  //         timestamp = Math.floor(parsed.getTime() / 1000);
+  //       }
+  //     }
 
-      await fetch("http://localhost:8000/sensor-data", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-    }
-  }
+  //     const payload = {
+  //       temperature: row.temperature,
+  //       humidity: row.humidity,
+  //       air_quality: Math.min(row.air_quality ?? 0, 1023),
+  //       timestamp,
+  //     };
+
+  //     await fetch("http://localhost:8000/sensor-data", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify(payload),
+  //     });
+  //   }
+  // }
+
+//   useEffect(() => {
+//   //warmupModel(); // call immediately on mount
+//   const interval = setInterval(warmupModel, 500000);
+//   return () => clearInterval(interval);
+// }, []);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      warmupModel();
-    }, 5000);
+  async function fetchData() {
+  const res = await fetch("/api/weather");
+  const json = await res.json();
 
-    return () => clearInterval(interval);
-  }, []);
+  if (!json.success || json.data.length === 0) return;
 
-  useEffect(() => {
-    async function fetchData() {
-      const res = await fetch("http://localhost:8000/forecast");
-      const json = await res.json();
-      setForecast(json);
-    }
+  const latest = json.data[json.data.length - 1];
 
-    fetchData();
-    const interval = setInterval(fetchData, 2000);
+  setForecast(latest);
+}
 
-    return () => clearInterval(interval);
-  }, []);
+  fetchData();
+  const interval = setInterval(fetchData, 2000);
+  return () => clearInterval(interval);
+}, []);
 
-  if (!forecast) return <div className="p-6 text-white">Loading...</div>;
+  
+if (!forecast) {
+  return <div className="p-6 text-white">Loading...</div>;
+}
 
-  if (forecast.status === "warming_up") {
-    return (
-      <div className="p-6 text-white text-lg">
-        Warming up model...
-      </div>
-    );
-  }
+if (forecast.forecast_status === "warming_up") {
+  return <div className="p-6 text-white">Warming up model...</div>;
+}
 
   return (
     <MetricPageLayout>
@@ -79,14 +81,14 @@ export default function ForecastPage() {
 
           <StatCard
             title="Current AQI"
-            value={forecast.current_air_quality}
+            value={forecast.air_quality}
             unit=""
             accentColor="bg-[#036bda]"
           />
 
           <StatCard
-            title="EMA"
-            value={forecast.ema_air_quality}
+            title="Forecast (5min)"
+            value={forecast.forecast_5min}
             unit=""
             accentColor="bg-[#2b6cb0]"
           />
@@ -100,14 +102,14 @@ export default function ForecastPage() {
 
           <StatCard
             title="Confidence"
-            value={(forecast.confidence * 100).toFixed(1)}
+            value={forecast.confidence ? (forecast.confidence * 100).toFixed(1) : "0"}
             unit="%"
             accentColor="bg-[#38a169]"
           />
 
           <StatCard
             title="Risk Score"
-            value={forecast.risk_score.toFixed(3)}
+            value={forecast.risk_score ? forecast.risk_score.toFixed(3) : "0"}
             unit=""
             accentColor="bg-[#e53e3e]"
           />
@@ -122,7 +124,7 @@ export default function ForecastPage() {
 
             <div className="space-y-4">
 
-              <div className="p-4 rounded-xl bg-[#0f1115] flex justify-between">
+              {/* <div className="p-4 rounded-xl bg-[#0f1115] flex justify-between">
                 <span>1 minute</span>
                 <span className="text-[#036bda] font-bold">
                   {forecast.forecast_1min}
@@ -134,7 +136,7 @@ export default function ForecastPage() {
                 <span className="text-[#036bda] font-bold">
                   {forecast.forecast_3min}
                 </span>
-              </div>
+              </div> */}
 
               <div className="p-4 rounded-xl bg-[#0f1115] flex justify-between">
                 <span>5 minutes</span>
@@ -156,7 +158,7 @@ export default function ForecastPage() {
               <p>
                 Status:{" "}
                 <span className="text-white">
-                  {forecast.status}
+                  {forecast.forecast_status}
                 </span>
               </p>
 

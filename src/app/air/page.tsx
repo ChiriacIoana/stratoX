@@ -15,7 +15,7 @@ export default function AirQualityPage() {
         <MetricStatsCard
           data={data}
           valueKey="air_quality"
-          unit=" AQI"
+          unit=" "
           color="#036bda"
           title="Air Quality"
         />
